@@ -1,0 +1,33 @@
+{
+  "name": "seo-bot-api",
+  "version": "1.0.0",
+  "description": "seo bot accessible with a web services API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goldminer1030/seo-bot-api.git"
+  },
+  "keywords": [
+    "node",
+    "zombie",
+    "api",
+    "seo",
+    "bot"
+  ],
+  "author": "goldminer1030",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/goldminer1030/seo-bot-api/issues"
+  },
+  "homepage": "https://github.com/goldminer1030/seo-bot-api#readme",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "mongoose": "^4.13.0"
+  }
+}
