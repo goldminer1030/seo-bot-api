@@ -8,12 +8,14 @@ var router   = express.Router();
 var request  = require('request');
 var async    = require('async');
 var cheerio  = require('cheerio');
-var util     = require('../util');
 var hma      = require('hma-proxy-scraper');
+var util     = require('../util');
 var config   = require('../config'); // get our config file tokens
 var totalResults = 0;
 
-router.put('/', util.isLoggedin, function(req,res,next){
+router.put('/', util.isValidToken, function(req,res,next){
+  if(!req.isValidToken) return res.json(util.successFalse(null,'Invalid token!'));
+
   var url = req.body.url,
       keywords = req.body.keywords;
 
@@ -21,10 +23,13 @@ router.put('/', util.isLoggedin, function(req,res,next){
     return res.json(util.successFalse("parameter error"));
   }
 
+  console.log('url: ' + url);
+
   // get proxies
   hma.getProxies(function (err,proxies) {
     if(err) return res.json(util.successFalse(err));
 
+    var resultData = [];
     var queue = async.queue(function (task, callback) {
       var domain = extractRootDomain(url);
       var reqOpts = {
@@ -34,8 +39,6 @@ router.put('/', util.isLoggedin, function(req,res,next){
       	proxy: proxies[Math.floor(proxies.length * Math.random())]
     	};
 
-      console.log(task.url);
-
       request(reqOpts, function(error, response, body) {
         if (error) {
     			console.trace("Couldn’t get Google page because of error.");
@@ -44,9 +47,8 @@ router.put('/', util.isLoggedin, function(req,res,next){
     			return res.json(util.successFalse(error));
     		}
         // load the body of the page into Cheerio so we can traverse the DOM
-    		var $ = cheerio.load(body), result = $(".g"), json = [], heading = "", url = "", match = false;
+    		var $ = cheerio.load(body), result = $(".g"), json = [], heading = "", url = "", keywordsPosition = parseInt(config.num), match = false;
 
-        console.log("result length: " + result.length);
     		if (result.length === 0) {
     			console.log("Keyword Rank Checker Issue with HTML Response from Google", JSON.stringify(body));
     		} else {
@@ -63,70 +65,36 @@ router.put('/', util.isLoggedin, function(req,res,next){
     						return;
     					}
 
-    					if (url.search(domain) != -1) {
-    						console.log("Found match: " + url);
-    						console.log("Rank: " + rank);
+    					if (!match && url.search(domain) != -1) {
+                keywordsPosition = rank;
     						match = true;
-    					} else {
-    						match = false;
     					}
-
-    					// console.log("rank: " + rank + ", title: " + heading + ", url: " + url);
     				}
     				totalResults++;
           });
     		}
-        callback(); //Tell async that this queue item has been processed
+        callback(null, keywordsPosition); //Tell async that this queue item has been processed
       });
-    }, 2);
+    }, 5);
 
     // assign a callback
     queue.drain = function() {
       console.log('all items have been processed');
-      return res.json(util.successTrue("success"));
+      return res.json(util.successKeywordsPosition(url, resultData));
     };
 
     // loop keyword
     keywords.forEach(function(keyword) {
       var checkingURL = config.region + "/search?num=" + config.num + "&q=" + keyword + "&ie=utf-8&oe=utf-8&tbs=li:1&pws=0";
-      queue.push({ url: checkingURL }, function (err) {
-        console.log('finished processing' + checkingURL);
+      queue.push({ url: checkingURL }, function (err, keywordsPosition) {
+        var data = {};
+        data[keyword] = keywordsPosition;
+        resultData.push(data);
+        console.log('finished processing -- key: ' + keyword + ', position: '+ keywordsPosition);
       });
     });
   });
 });
-
-// router.put('/:username', util.isLoggedin, function(req,res,next) {
-//   User.findOne({username:req.params.username}).exec(function(err,user) {
-//     if(err||!user) return res.json(util.successFalse(err));
-//     else if(!req.decoded || user._id != req.decoded._id)
-//     return res.json(util.successFalse(null,'You don\'t have permission'));
-//
-//     var url = req.body.url,
-//     keywords = req.body.keywords;
-//     var checkingURL = config.region + "/search?num=" + config.num + "&q=" + keyword + "&ie=utf-8&oe=utf-8&tbs=li:1&pws=0";
-//
-//     // get proxies
-//     hma.getProxies(function (err,proxies) {
-//       if(err) return res.json(util.successFalse(err));
-//
-//       var reqOpts = {
-//       	url: checkingURL,
-//       	method: "GET",
-//       	headers: {"Cache-Control" : "no-cache"},
-//       	proxy: proxies[Math.floor(proxies.length * Math.random())]
-//     	};
-//
-//       request(reqOpts, function (error, response, body) {
-//         if (error) {
-//     			console.trace("Couldn’t get Google page because of error.");
-//     			console.error(error.stack);
-//     			return res.json(util.successFalse(error));
-//     		}
-//       });
-//     });
-//   });
-// });
 
 // private functions
 function extractHostname(url) {

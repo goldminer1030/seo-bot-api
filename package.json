@@ -28,6 +28,7 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.2",
     "cheerio": "^1.0.0-rc.2",
+    "crypto": "^1.0.1",
     "express": "^4.16.2",
     "hma-proxy-scraper": "0.0.4",
     "jsonwebtoken": "^8.1.0",

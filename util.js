@@ -1,6 +1,7 @@
 //util.js
 
 var jwt    = require('jsonwebtoken');
+var crypto = require('crypto');
 var config = require('./config'); // get our config file tokens
 
 var util = {};
@@ -10,6 +11,20 @@ util.successTrue = function(data){ //create success json
     success:true,
     message:null,
     errors:null,
+    data:data
+  };
+};
+
+util.successKeywordsPosition = function(url, data){ //create success task json
+  return {
+    url:url,
+    keywords:data
+  };
+};
+
+util.successAnalyseData = function(url, data){ //create success task json
+  return {
+    url:url,
     data:data
   };
 };
@@ -52,6 +67,23 @@ util.isLoggedin = function(req,res,next){ //check if there is token or not, if t
         next();
       }
     });
+  }
+};
+
+util.isValidToken = function(req,res,next){ //check if there is token or not, if token, confirm token hash using crypto
+  var token = req.headers['x-access-token'];
+  if (!token) return res.json(util.successFalse(null,'token is required!'));
+  else {
+    var decipher = crypto.createDecipher(config.algorithm, config.secret);
+    try {
+      var decrypted = decipher.update(token, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+
+      req.isValidToken = crypto.timingSafeEqual(new Buffer(decrypted), new Buffer(config.password));
+      next();
+    } catch (ex) {
+      next();
+    }
   }
 };
 
