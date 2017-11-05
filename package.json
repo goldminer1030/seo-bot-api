@@ -24,12 +24,15 @@
   },
   "homepage": "https://github.com/goldminer1030/seo-bot-api#readme",
   "dependencies": {
+    "async": "^2.5.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.2",
+    "cheerio": "^1.0.0-rc.2",
     "express": "^4.16.2",
-    "google": "^2.1.0",
+    "hma-proxy-scraper": "0.0.4",
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^4.13.0",
-    "morgan": "^1.9.0"
+    "morgan": "^1.9.0",
+    "request": "^2.83.0"
   }
 }
