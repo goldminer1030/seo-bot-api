@@ -45,6 +45,7 @@ app.use(function (req, res, next) {
 app.use('/api/users', require('./api/users')); // route users
 app.use('/api/auth', require('./api/auth'));   // route auth
 app.use('/api/keywords', require('./api/keywords'));   // route keywords
+app.use('/api/analyse', require('./api/analyse'));   // route analyse
 
 // Server
 app.listen(port, function(){

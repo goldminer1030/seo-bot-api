@@ -13,7 +13,7 @@ var util     = require('../util');
 var config   = require('../config'); // get our config file tokens
 var totalResults = 0;
 
-router.put('/', util.isValidToken, function(req,res,next){
+router.post('/', util.isValidToken, function(req,res,next){
   if(!req.isValidToken) return res.json(util.successFalse(null,'Invalid token!'));
 
   var url = req.body.url,
@@ -35,7 +35,11 @@ router.put('/', util.isValidToken, function(req,res,next){
       var reqOpts = {
       	url: task.url,
       	method: "GET",
-      	headers: {"Cache-Control" : "no-cache"},
+        headers: {
+          "User-Agent":     "Chrome/27.0.1453.110",
+          "Content-Type" :  "application/x-www-form-urlencoded",
+          "Cache-Control" : "no-cache"
+        },
       	proxy: proxies[Math.floor(proxies.length * Math.random())]
     	};
 
