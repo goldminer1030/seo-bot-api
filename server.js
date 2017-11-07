@@ -6,26 +6,14 @@
 var express    = require('express');
 var app        = express();
 var path       = require('path');
-var mongoose   = require('mongoose');
 var bodyParser = require('body-parser');
 var morgan     = require('morgan');
 
 // =======================
 // configuration =========
 // =======================
-var port = process.env.PORT || 3000; // used to create, sign, and verify
+var port = process.env.PORT || 8000; // used to create, sign, and verify
 var config = require('./config'); // get our config file tokens
-
-// Database
-mongoose.Promise = global.Promise;
-mongoose.connect(config.database, {useMongoClient: true});
-var db = mongoose.connection;
-db.once('open', function () {
-  console.log('DB connected!');
-});
-db.on('error', function (err) {
-  console.log('DB ERROR:', err);
-});
 
 // Middlewares
 app.use(bodyParser.json());
@@ -42,8 +30,6 @@ app.use(function (req, res, next) {
 });
 
 // API
-app.use('/api/users', require('./api/users')); // route users
-app.use('/api/auth', require('./api/auth'));   // route auth
 app.use('/api/keywords', require('./api/keywords'));   // route keywords
 app.use('/api/analyse', require('./api/analyse'));   // route analyse
 

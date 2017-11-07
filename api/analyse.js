@@ -43,7 +43,12 @@ router.post('/', util.isValidToken, function(req,res,next){
       title = $('head title').text(),
       desc = $('meta[name="description"]').attr('content'),
       kwd = $('meta[name="keywords"]').attr('content'),
-      headlines = $('h1, h2, h3, h4, h5, h6'),
+      h1 = $('h1'),
+      h2 = $('h2'),
+      h3 = $('h3'),
+      h4 = $('h4'),
+      h5 = $('h5'),
+      h6 = $('h6'),
       strong = $('strong'),
       internalLink = $("a[href^='/']"),
       externalLink = $("a[href^='http']"),
@@ -58,13 +63,26 @@ router.post('/', util.isValidToken, function(req,res,next){
       var codeToTextRatio = 0;
       if(textLength > 0 && contentLength > 0) {
         codeToTextRatio = textLength / contentLength * 100;
+      } else {
+        // if failed to get content length
+        var chunk = chunkSubstr(body, 1024);
+
+        if(chunk && textLength > 0) {
+          codeToTextRatio = textLength / (chunk.length * 1024) * 100;
+        }
       }
 
+      // prepare result data to return
       resultData.push(getArray('Ratio text/code', codeToTextRatio.toFixed(2) + '%'));
-      resultData.push(getArray('Headlines', headlines.length));
+      resultData.push(getArray('Title', title));
+      resultData.push(getArray('H1', h1.length));
+      resultData.push(getArray('H2', h1.length));
+      resultData.push(getArray('H3', h1.length));
+      resultData.push(getArray('H4', h1.length));
+      resultData.push(getArray('H5', h1.length));
+      resultData.push(getArray('H6', h1.length));
       resultData.push(getArray('Number of strong', strong.length));
       resultData.push(getArray('Count images', images.length));
-      resultData.push(getArray('Meta title', title));
       resultData.push(getArray('Meta description', desc));
       resultData.push(getArray('Meta keywords', kwd));
       resultData.push(getArray('Number of follow links', followLink.length));
@@ -77,12 +95,23 @@ router.post('/', util.isValidToken, function(req,res,next){
 });
 
 // private function
+function chunkSubstr(str, size) {
+  var numChunks = Math.ceil(str.length / size),
+  chunks = new Array(numChunks);
+
+  for(var i = 0, o = 0; i < numChunks; ++i, o += size) {
+    chunks[i] = str.substr(o, size);
+  }
+
+  return chunks;
+}
+
 function getArray(key, value) {
   var data = {};
   if(value)
-    data[key] = value;
+  data[key] = value;
   else
-    data[key] = 0;
+  data[key] = 0;
 
   return data;
 }
