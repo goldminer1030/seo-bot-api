@@ -76,11 +76,11 @@ router.post('/', util.isValidToken, function(req,res,next){
       resultData.push(getArray('Ratio text/code', codeToTextRatio.toFixed(2) + '%'));
       resultData.push(getArray('Title', title));
       resultData.push(getArray('H1', h1.length));
-      resultData.push(getArray('H2', h1.length));
-      resultData.push(getArray('H3', h1.length));
-      resultData.push(getArray('H4', h1.length));
-      resultData.push(getArray('H5', h1.length));
-      resultData.push(getArray('H6', h1.length));
+      resultData.push(getArray('H2', h2.length));
+      resultData.push(getArray('H3', h3.length));
+      resultData.push(getArray('H4', h4.length));
+      resultData.push(getArray('H5', h5.length));
+      resultData.push(getArray('H6', h6.length));
       resultData.push(getArray('Number of strong', strong.length));
       resultData.push(getArray('Count images', images.length));
       resultData.push(getArray('Meta description', desc));
