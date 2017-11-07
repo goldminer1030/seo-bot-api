@@ -40,7 +40,7 @@ router.post('/', util.isValidToken, function(req,res,next){
       resultData = [],
       textLength = 0,
       contentLength = response.headers['content-length'],
-      title = $('head title').text(),
+      title = $('title').text(),
       desc = $('meta[name="description"]').attr('content'),
       kwd = $('meta[name="keywords"]').attr('content'),
       h1 = $('h1'),
